@@ -16,7 +16,7 @@
         <field name="options"        column="options"          type="array"    nullable="true"/>
         <field name="quantity"       column="quantity"         type="string" />
 
-        <many-to-one field="cart" target-entity="Vespolina\CartBundle\Entity\Cart" inversed-by="cartItems">
+        <many-to-one field="parent" target-entity="Vespolina\CartBundle\Entity\Cart" inversed-by="cartItems">
               <join-column name="cartId" referenced-column-name="id" />
         </many-to-one>
 

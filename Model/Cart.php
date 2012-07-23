@@ -19,6 +19,8 @@ use Vespolina\Entity\Cart as CoreCart;
 class Cart extends CoreCart
 {
     protected $createdAt;
+    
+    protected $updatedAt;
 
     /**
      * Constructor
