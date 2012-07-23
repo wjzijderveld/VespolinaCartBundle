@@ -4,6 +4,7 @@ namespace Vespolina\CartBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class Product extends AbstractType
 {
@@ -12,12 +13,12 @@ class Product extends AbstractType
         $builder->add('id', 'hidden');
     }
 
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        return array(
+        $resolver->setDefaults(array(
             'data_class' => 'Vespolina\ProductBundle\Model\Product',
             'cascade_validation' => true,
-        );
+        ));
     }
 
     public function getName()

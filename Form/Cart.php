@@ -4,6 +4,7 @@ namespace Vespolina\CartBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class Cart extends AbstractType
 {
@@ -12,11 +13,11 @@ class Cart extends AbstractType
         $builder->add('items', 'collection', array('type' => new CartItem()));
     }
 
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        return array(
+        $resolver->setDefaults(array(
             'data_class' => 'Vespolina\CartBundle\Model\Cart',
-        );
+        ));
     }
 
     public function getName()
