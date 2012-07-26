@@ -14,8 +14,9 @@
     "require": {
         "php": ">=5.3.2",
         "symfony/symfony": "dev-master",
-        "vespolina/core": "dev-master"
+        "vespolina/cart": "dev-master"
     },
+    "minimum-stability": "dev",
     "require-dev": {
         "doctrine/mongodb-odm-bundle": "dev-master"
     },
