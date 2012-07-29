@@ -7,13 +7,11 @@
  */
 namespace Vespolina\CartBundle\Document;
 
-use Vespolina\CartBundle\Document\BaseCart;
+use Vespolina\Entity\Order\Cart as BaseCart;
 /**
  * @author Daniel Kucharski <daniel@xerias.be>
  */
 class Cart extends BaseCart
 {
-    public function __construct()
-    {
-    }
+
 }

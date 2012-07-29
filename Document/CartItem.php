@@ -7,11 +7,11 @@
  */
 namespace Vespolina\CartBundle\Document;
 
-use Vespolina\CartBundle\Document\BaseCartItem;
+use Vespolina\Entity\Order\Item;
 /**
  * @author Daniel Kucharski <daniel@xerias.be>
  */
-class CartItem extends BaseCartItem
+class CartItem extends Item
 {
 
 }
