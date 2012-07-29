@@ -6,7 +6,17 @@
 
     <embedded-document name="Vespolina\CartBundle\Document\CartItem">
 
-       <!-- <reference-one fieldName="product" field="product" /> -->
+        <field name="name"           fieldName="name"           type="string" />
+        <field name="options"        fieldName="options"        type="hash" />
+        <field name="quantity"       fieldName="quantity"       type="string" />
+        <field name="state"          fieldName="state"          type="string" />
+<!--        <field name="totalPrice"     fieldName="totalPrice"     type="string" /> -->
+
+        <reference-one fieldName="product" field="product" />
+
+        <reference-one fieldName="parent" field="parent" />
+
+        <embedd-one field="pricingSet" fieldName="pricingSet" />
 
     </embedded-document>
 </doctrine-mongo-mapping>
