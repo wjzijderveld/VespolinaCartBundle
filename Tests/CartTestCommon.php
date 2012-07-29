@@ -12,7 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Vespolina\CartBundle\Model\Cart;
 use Vespolina\CartBundle\Handler\DefaultCartHandler;
 use Vespolina\CartBundle\Pricing\DefaultCartPricingProvider;
-use Vespolina\CartBundle\Tests\Fixtures\Document\Cartable;
+use Vespolina\CartBundle\Tests\Fixtures\Document\Product;
 use Vespolina\CartBundle\Tests\Fixtures\Document\RecurringCartable;
 
 use Vespolina\ProductBundle\Model\RecurringInterface; // todo move to cart bundle
@@ -41,13 +41,13 @@ abstract class CartTestCommon extends WebTestCase
         return $cart;
     }
 
-    protected function createCartItem($cartableItem)
+    protected function createCartItem($product)
     {
         // todo: this should handle recurring interface
-        $cartItem = $this->getMockForAbstractClass('Vespolina\CartBundle\Model\CartItem', array($cartableItem));
-        $cartItem->setDescription($cartableItem->getName());
+        $cartItem = $this->getMockForAbstractClass('Vespolina\CartBundle\Model\CartItem', array($product));
+        $cartItem->setDescription($product->getName());
 
-        if ($cartableItem instanceof RecurringInterface) {
+        if ($product instanceof RecurringInterface) {
             $irp = new \ReflectionProperty('Vespolina\CartBundle\Model\CartItem', 'isRecurring');
             $irp->setAccessible(true);
             $irp->setValue($cartItem, true);
@@ -63,13 +63,13 @@ abstract class CartTestCommon extends WebTestCase
         return $cartItem;
     }
 
-    protected function createCartableItem($name, $price)
+    protected function createProduct($name, $price)
     {
-        $cartable = new Cartable();
-        $cartable->setName($name);
-        $cartable->setPricing(array('unitPrice' => $price));
+        $product = new Product();
+        $product->setName($name);
+        $product->setPricing(array('unitPrice' => $price));
 
-        return $cartable;
+        return $product;
     }
 
     protected function createRecurringCartableItem($name, $price)
