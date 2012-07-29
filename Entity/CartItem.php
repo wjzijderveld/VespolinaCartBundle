@@ -7,12 +7,11 @@
  */
 namespace Vespolina\CartBundle\Entity;
 
-use Vespolina\CartBundle\Entity\BaseCartItem;
+use Vespolina\CartBundle\Model\BaseCartItem;
 /**
  * @author Daniel Kucharski <daniel@xerias.be>
  */
 class CartItem extends BaseCartItem
 {
 
-    protected $id;
 }

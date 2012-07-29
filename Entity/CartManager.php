@@ -9,15 +9,13 @@ namespace Vespolina\CartBundle\Entity;
 
 use Symfony\Component\DependencyInjection\Container;
 use Doctrine\ORM\EntityManager;
-
+use Vespolina\Cart\Pricing\CartPricingProviderInterface;
 use Vespolina\CartBundle\Entity\Cart;
-use Vespolina\Entity\CartInterface;
-use Vespolina\Entity\OrderInterface;
+use Vespolina\Entity\Order\CartInterface;
+use Vespolina\Entity\Order\ItemInterface;
 use Vespolina\Entity\ProductInterface;
-use Vespolina\Entity\ItemInterface;
-use Vespolina\CartBundle\Model\CartManager as BaseCartManager;
-use Vespolina\CartBundle\Pricing\CartPricingProviderInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Vespolina\Cart\Manager\CartManager as BaseCartManager;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * @author Daniel Kucharski <daniel@xerias.be>
@@ -25,26 +23,23 @@ use Symfony\Component\HttpFoundation\Session\Session;
  */
 class CartManager extends BaseCartManager
 {
-    protected $cartClass;
     protected $cartRepo;
     protected $em;
-    protected $primaryIdentifier;
     protected $session;
 
-    public function __construct(EntityManager $em, Session $session, CartPricingProviderInterface $pricingProvider = null, $cartClass, $cartItemClass)
+    public function __construct(EntityManager $em, SessionInterface $session, CartPricingProviderInterface $pricingProvider = null, $cartClass, $cartItemClass, $cartEvents, $eventClass, $eventDispatcher)
     {
         $this->em = $em;
 
-        $this->cartClass = $cartClass;
         $this->cartRepo = $this->em->getRepository($cartClass);
         $this->session = $session;
 
-        parent::__construct($pricingProvider, $cartClass, $cartItemClass);
+        parent::__construct($pricingProvider, $cartClass, $cartItemClass, $cartEvents, $eventClass, $eventDispatcher);
     }
 
-    public function addItemToCart(CartInterface $cart, ProductInterface $product, $quantity = null)
+    public function addProductToCart(CartInterface $cart, ProductInterface $product, array $options = null, $quantity = null)
     {
-        $item = $this->doAddItemToCart($cart, $product, $quantity);
+        $item = parent::addProductToCart($cart, $product, $options, $quantity);
 
         // todo: just update this cart, don't flush everything
         if ($cart->getId() !== $cart->getId()) {
@@ -58,25 +53,6 @@ class CartManager extends BaseCartManager
         } else {
             $this->updateCart($cart);
         }
-    }
-
-    public function findOpenCartByOwner($owner)
-    {
-
-        if ($owner) {
-
-            $q = $this->em->createQueryBuilder($this->cartClass)
-                            ->select('c')
-                            ->from('Vespolina\CartBundle\Entity\Cart', 'c')
-                            ->where('c.owner = ?1')
-                            ->andWhere('c.state = ?2')
-                            ->getQuery();
-            $q->setMaxResults(1);   //Temp
-            $q->setParameters(array(1 => $owner, 2 => Cart::STATE_OPEN));
-
-            return $q->getSingleResult();
-        }
-
     }
 
     /**
@@ -95,23 +71,21 @@ class CartManager extends BaseCartManager
         return $this->cartRepo->find($id);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function findCartByIdentifier($name, $code)
+    public function findOpenCartByOwner($owner)
     {
 
-           return;
-    }
+        if ($owner) {
 
-    /**
-     * @inheritdoc
-     */
-    public function updateCart(CartInterface $cart, $andFlush = true)
-    {
-        $this->em->persist($cart);
-        if ($andFlush) {
-            $this->em->flush();
+            $q = $this->em->createQueryBuilder($this->cartClass)
+                            ->select('c')
+                            ->from('Vespolina\CartBundle\Entity\Cart', 'c')
+                            ->where('c.owner = ?1')
+                            ->andWhere('c.state = ?2')
+                            ->getQuery();
+            $q->setMaxResults(1);   //Temp
+            $q->setParameters(array(1 => $owner, 2 => Cart::STATE_OPEN));
+
+            return $q->getSingleResult();
         }
     }
 
@@ -126,10 +100,23 @@ class CartManager extends BaseCartManager
         } elseif (!$cart = $this->findOpenCartByOwner($owner)) {
             $cart = $this->createCart();
             $cart->setOwner($owner);
-            $this->updateCart();
+            $this->updateCart($cart);
         }
         $this->session->set('vespolina_cart', $cart);
 
         return $cart;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function updateCart(CartInterface $cart, $andPersist = true)
+    {
+        parent::updateCart($cart, $andPersist);
+
+        $this->em->persist($cart);
+        if ($andPersist) {
+            $this->em->flush($cart);
+        }
     }
 }

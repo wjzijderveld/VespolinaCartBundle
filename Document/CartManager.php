@@ -9,12 +9,12 @@ namespace Vespolina\CartBundle\Document;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Vespolina\Cart\Pricing\CartPricingProviderInterface;
 use Vespolina\CartBundle\Document\Cart;
-use Vespolina\Entity\CartInterface;
-use Vespolina\Entity\ItemInterface;
+use Vespolina\Entity\Order\CartInterface;
+use Vespolina\Entity\Order\ItemInterface;
 use Vespolina\Entity\ProductInterface;
-use Vespolina\CartBundle\Model\CartManager as BaseCartManager;
-use Vespolina\CartBundle\Pricing\CartPricingProviderInterface;
+use Vespolina\Cart\Manager\CartManager as BaseCartManager;
 
 /**
  * @author Daniel Kucharski <daniel@xerias.be>
@@ -22,30 +22,19 @@ use Vespolina\CartBundle\Pricing\CartPricingProviderInterface;
  */
 class CartManager extends BaseCartManager
 {
-    protected $cartClass;
     protected $cartRepo;
     protected $dm;
     protected $primaryIdentifier;
     protected $session;
 
-    public function __construct(DocumentManager $dm, SessionInterface $session, CartPricingProviderInterface $pricingProvider = null, $cartClass, $cartItemClass)
+    public function __construct(DocumentManager $dm, SessionInterface $session, CartPricingProviderInterface $pricingProvider = null, $cartClass, $cartItemClass, $cartEvents, $eventClass, $eventDispatcher)
     {
         $this->dm = $dm;
 
-        $this->cartClass = $cartClass;
         $this->cartRepo = $this->dm->getRepository($cartClass);
         $this->session = $session;
 
-        parent::__construct($pricingProvider, $cartClass, $cartItemClass);
-    }
-
-    public function findOpenCartByOwner($owner)
-    {
-        return $this->dm->createQueryBuilder($this->cartClass)
-                    ->field('owner.$id')->equals(new \MongoId($owner->getId()))
-                    ->field('state')->equals(Cart::STATE_OPEN)
-                    ->getQuery()
-                    ->getSingleResult();
+        parent::__construct($pricingProvider, $cartClass, $cartItemClass, $cartEvents, $eventClass, $eventDispatcher);
     }
 
     /**
@@ -76,12 +65,13 @@ class CartManager extends BaseCartManager
             ->getSingleResult();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function findCartByIdentifier($name, $code)
+    public function findOpenCartByOwner($owner)
     {
-        return;
+        return $this->dm->createQueryBuilder($this->cartClass)
+            ->field('owner.$id')->equals(new \MongoId($owner->getId()))
+            ->field('state')->equals(Cart::STATE_OPEN)
+            ->getQuery()
+            ->getSingleResult();
     }
 
     public function getActiveCart($owner = null)
@@ -106,10 +96,12 @@ class CartManager extends BaseCartManager
     /**
      * @inheritdoc
      */
-    public function updateCart(CartInterface $cart, $andFlush = true)
+    public function updateCart(CartInterface $cart, $andPersist = true)
     {
+        parent::updateCart($cart, $andPersist);
+
         $this->dm->persist($cart);
-        if ($andFlush) {
+        if ($andPersist) {
             $this->dm->flush($cart);
         }
     }
