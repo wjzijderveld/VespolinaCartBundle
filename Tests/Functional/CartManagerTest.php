@@ -20,7 +20,7 @@ use Vespolina\CartBundle\Document\CartManager;
 use Vespolina\Cart\Pricing\DefaultCartPricingProvider;
 use Vespolina\CartBundle\Tests\CartTestCommon;
 use Vespolina\CartBundle\Tests\Fixtures\Document\Person;
-use Vespolina\Entity\Product;
+use Vespolina\CartBundle\Tests\Fixtures\Document\Product;
 use Vespolina\EventDispatcher\NullDispatcher;
 
 
