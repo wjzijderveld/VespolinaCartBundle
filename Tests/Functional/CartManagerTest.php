@@ -8,9 +8,11 @@
 namespace Vespolina\CartBundle\Tests\Functional;
 
 use Doctrine\Bundle\MongoDBBundle\Tests\TestCase;
+use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\MongoDB\Connection;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\Bundle\MongoDBBundle\Mapping\Driver\XmlDriver;
+use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
@@ -179,8 +181,19 @@ class CartManagerTest extends TestCase
         $config->setHydratorDir(\sys_get_temp_dir());
         $config->setProxyNamespace('SymfonyTests\Doctrine');
         $config->setHydratorNamespace('SymfonyTests\Doctrine');
+
         $xmlDriver = new XmlDriver($paths, '.mongodb.xml');
-        $config->setMetadataDriverImpl($xmlDriver);
+        $xmlDriver->setGlobalBasename('mapping');
+
+        $chain = new MappingDriverChain();
+        $chain->addDriver($xmlDriver, 'Vespolina\\CartBundle\\Document');
+
+        AnnotationDriver::registerAnnotationClasses();
+        $reader = new \Doctrine\Common\Annotations\AnnotationReader();
+        $annotationDriver = new \Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver($reader, '/../Fixtures/config/doctrine');
+        $chain->addDriver($annotationDriver, 'Vespolina\\CartBundle\\Tests\\Fixtures\\Document');
+
+        $config->setMetadataDriverImpl($chain);
         $config->setMetadataCacheImpl(new \Doctrine\Common\Cache\ArrayCache());
 
         return DocumentManager::create(new Connection(), $config);
