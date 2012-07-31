@@ -33,6 +33,7 @@ class CartManagerTest extends TestCase
 {
     protected $cartMgr;
     protected $container;
+    protected $dm;
     protected $storage;
     protected $session;
 
@@ -41,19 +42,23 @@ class CartManagerTest extends TestCase
         $cart = $this->persistNewCart();
         $product = new Product();
         $product->setName('product1');
+        $this->dm->persist($product);
+        $this->dm->flush();
+
         $this->cartMgr->addProductToCart($cart, $product);
         $this->cartMgr->updateCart($cart);
+        $cartId = $cart->getId();
 
-        $items = $cart->getItems();
-        $this->assertSame(1, $items->count());
-        $item = $items->current();
-        $this->assertSame($cartable, $item->getCartableItem());
-        $this->assertSame(1, $item->getQuantity());
+        $this->dm->detach($cart);
 
-        $existingItem = $this->cartMgr->addItemToCart($cart, $cartable);
-        $items = $cart->getItems();
+        $loadedCart = $this->cartMgr->findCartById($cartId);
+        $items = $loadedCart->getItems();
         $this->assertSame(1, $items->count());
-        $this->assertSame(2, $existingItem->getQuantity());
+        $item = $items[0];
+        $loadedProduct = $item->getProduct();
+        $productName = $loadedProduct->getName();
+        $this->assertSame('product1', $loadedProduct->getName());
+        $this->assertEquals(1, $item->getQuantity());
     }
 
     public function testUpdateCart()

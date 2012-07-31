@@ -13,13 +13,13 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "symfony/symfony": "dev-master",
+        "symfony/http-foundation": "dev-master",
         "vespolina/cart": "dev-master"
     },
-    "minimum-stability": "dev",
     "require-dev": {
         "doctrine/mongodb-odm-bundle": "*"
     },
+    "minimum-stability": "dev",
     "suggest": {
         "symfony/doctrine-bundle": "dev-master",
         "symfony/mongodb-odm-bundle": "dev-master"
