@@ -26,66 +26,14 @@ class Product extends CoreProduct
     /** @ODM\String */
     protected $name;
 
-    protected $pricing;
-
-    protected $optionSet;
-
-    protected $type;
 
     public function __construct()
-   {
+    {
        $this->prices = array();
-   }
-
+    }
 
     public function setId($id)
     {
         $this->id = $id;
-    }
-
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function setPricing($pricing)
-    {
-        $this->pricing = $pricing;
-    }
-
-    public function getPricing()
-    {
-
-        return $this->pricing;
-    }
-
-    public function getCartableName()
-    {
-        return $this->name;
-    }
-
-    public function getOptionSet()
-    {
-        return $this->optionSet;
-    }
-
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    public function setType($type)
-    {
-        $this->type = $type;
     }
 }
