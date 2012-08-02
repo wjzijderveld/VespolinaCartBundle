@@ -16,7 +16,7 @@
 
         <!-- events -->
         <service id="vespolina.cart.listener.cart" class="Vespolina\CartBundle\EventListener\CartListener">
-            <tag name="kernel.event_listener" event="vespolina_cart.cart_finished" method="onFinishCart" />
+            <tag name="kernel.event_listener" event="vespolina_cart.item_update" method="onFinishCart" />
             <argument type="service" id="service_container" />
         </service>
     </services>

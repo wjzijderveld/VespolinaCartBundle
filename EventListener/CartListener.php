@@ -9,7 +9,7 @@
 namespace Vespolina\CartBundle\EventListener;
 
 use Symfony\Component\DependencyInjection\Container;
-use Vespolina\CartBundle\Event\CartEvent;
+use Vespolina\EventDispatcher\EventInterface;
 use Vespolina\Entity\OrderInterface;
 
 class CartListener
@@ -21,12 +21,11 @@ class CartListener
         $this->container = $container;
     }
 
-    public function onFinishCart(CartEvent $event)
+    public function onUpdateCart(EventInterface $event)
     {
-        $cart = $event->getCart();
+        $cart = $event->getSubject();
 
         $this->container->get('vespolina.cart_manager')->determinePrices($cart);
-
     }
 
     protected function getMailBody(OrderInterface $salesOrder)
