@@ -5,25 +5,46 @@
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
+
 namespace Vespolina\CartBundle\Tests;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-
-use Vespolina\CartBundle\Model\Cart;
+use Doctrine\Bundle\MongoDBBundle\Tests\TestCase;
+use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
+use Doctrine\MongoDB\Connection;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\Bundle\MongoDBBundle\Mapping\Driver\XmlDriver;
+use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Vespolina\CartBundle\Document\CartManager;
+use Vespolina\CartBundle\Document\Cart;
 use Vespolina\CartBundle\Handler\DefaultCartHandler;
-use Vespolina\CartBundle\Pricing\DefaultCartPricingProvider;
+use Vespolina\Cart\Pricing\DefaultCartPricingProvider;
 use Vespolina\CartBundle\Tests\Fixtures\Document\Product;
-use Vespolina\CartBundle\Tests\Fixtures\Document\RecurringCartable;
-
-use Vespolina\ProductBundle\Model\RecurringInterface; // todo move to cart bundle
+use Vespolina\EventDispatcher\NullDispatcher;
 
 /**
  * @author Daniel Kucharski <daniel@xerias.be>
  * @author Richard D Shank <develop@zestic.com>
  */
-abstract class CartTestCommon extends WebTestCase
+abstract class CartTestCommon extends TestCase
 {
     protected $pricingProvider;
+
+    public function setup()
+    {
+        $this->cartMgr = $this->createCartManager();
+    }
+
+    public function tearDown()
+    {
+        $collections = $this->dm->getDocumentCollections();
+        foreach ($collections as $collection) {
+            $collection->drop();
+        }
+    }
 
     protected function createCart($name = 'default')
     {
@@ -63,39 +84,35 @@ abstract class CartTestCommon extends WebTestCase
         return $cartItem;
     }
 
-    protected function createProduct($name, $price)
+    protected function createCartManager()
+    {
+        $pricingProvider = new DefaultCartPricingProvider();
+
+        $this->storage = new MockArraySessionStorage();
+        $this->session = new Session($this->storage, new AttributeBag(), new FlashBag());
+
+        $this->dm = self::createTestDocumentManager();
+        return new CartManager(
+            $this->dm,
+            $this->session,
+            $pricingProvider,
+            'Vespolina\CartBundle\Document\Cart',
+            'Vespolina\CartBundle\Document\CartItem',
+            'Vespolina\Cart\Event\CartEvents',
+            'Vespolina\EventDispatcher\Event',
+            new NullDispatcher()
+        );
+    }
+
+    protected function createProduct($name, $price = null)
     {
         $product = new Product();
         $product->setName($name);
-        $product->setPricing(array('unitPrice' => $price));
+        if ($price) {
+            $product->setPricing(array('unitPrice' => $price));
+        }
 
         return $product;
-    }
-
-    protected function createRecurringCartableItem($name, $price)
-    {
-        $cartable = new RecurringCartable();
-        $cartable->setName($name);
-        $cartable->setPrice('unitPrice', $price);
-
-        return $cartable;
-    }
-
-    protected function addItemToCart($cart, $cartableItem)
-    {
-        $cartItem = $this->createCartItem($cartableItem);
-        $rm = new \ReflectionMethod($cart, 'addItem');
-        $rm->setAccessible(true);
-        $rm->invokeArgs($cart, array($cartItem));
-        $rm->setAccessible(false);
-
-        $prrp = new \ReflectionProperty('Vespolina\CartBundle\Model\CartItem', 'pricingSet');
-        $prrp->setAccessible(true);
-        $prrp->setValue($cartItem, $this->getPricingProvider()->createPricingSet());
-        $prrp->setAccessible(false);
-
-        $this->getPricingProvider()->determineCartPrices($cart);
-        return $cartItem;
     }
 
     protected function getPricingProvider()
@@ -108,17 +125,6 @@ abstract class CartTestCommon extends WebTestCase
         }
 
         return $this->pricingProvider;
-    }
-
-    protected function removeItemFromCart($cart, $cartItem)
-    {
-        $item = $cartItem;
-        $rm = new \ReflectionMethod($cart, 'removeItem');
-        $rm->setAccessible(true);
-        $rm->invokeArgs($cart, array($cartItem));
-        $rm->setAccessible(false);
-
-        return $item;
     }
 
     protected function buildLoadedCart($name, $nonRecurringItems, $recurringItems = 0)
@@ -144,5 +150,45 @@ abstract class CartTestCommon extends WebTestCase
         $this->getPricingProvider()->determineCartPrices($cart);
 
         return $cart;
+    }
+
+    protected function persistNewCart($name = null)
+    {
+        $cart = $this->cartMgr->createCart($name);
+        $this->cartMgr->updateCart($cart);
+
+        return $cart;
+    }
+
+    /**
+     * @return DocumentManager
+     */
+    public static function createTestDocumentManager($paths = array())
+    {
+        $paths = array_merge(array(
+            __DIR__ . '/../Resources/config/doctrine' => 'Vespolina\\CartBundle\\Document',
+        ), $paths);
+        $config = new \Doctrine\ODM\MongoDB\Configuration();
+        $config->setAutoGenerateProxyClasses(true);
+        $config->setProxyDir(\sys_get_temp_dir());
+        $config->setHydratorDir(\sys_get_temp_dir());
+        $config->setProxyNamespace('SymfonyTests\Doctrine');
+        $config->setHydratorNamespace('SymfonyTests\Doctrine');
+
+        $xmlDriver = new XmlDriver($paths, '.mongodb.xml');
+        $xmlDriver->setGlobalBasename('mapping');
+
+        $chain = new MappingDriverChain();
+        $chain->addDriver($xmlDriver, 'Vespolina\\CartBundle\\Document');
+
+        AnnotationDriver::registerAnnotationClasses();
+        $reader = new \Doctrine\Common\Annotations\AnnotationReader();
+        $annotationDriver = new \Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver($reader, '/Fixtures/config/doctrine');
+        $chain->addDriver($annotationDriver, 'Vespolina\\CartBundle\\Tests\\Fixtures\\Document');
+
+        $config->setMetadataDriverImpl($chain);
+        $config->setMetadataCacheImpl(new \Doctrine\Common\Cache\ArrayCache());
+
+        return DocumentManager::create(new Connection(), $config);
     }
 }

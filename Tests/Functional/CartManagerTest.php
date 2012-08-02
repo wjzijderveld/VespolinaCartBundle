@@ -7,29 +7,20 @@
  */
 namespace Vespolina\CartBundle\Tests\Functional;
 
-use Doctrine\Bundle\MongoDBBundle\Tests\TestCase;
-use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
-use Doctrine\MongoDB\Connection;
-use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\Bundle\MongoDBBundle\Mapping\Driver\XmlDriver;
-use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver;
+
+
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
-use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Vespolina\CartBundle\Document\CartManager;
-use Vespolina\Cart\Pricing\DefaultCartPricingProvider;
+
+use Vespolina\CartBundle\Document\Cart;
 use Vespolina\CartBundle\Tests\CartTestCommon;
 use Vespolina\CartBundle\Tests\Fixtures\Document\Person;
 use Vespolina\CartBundle\Tests\Fixtures\Document\Product;
-use Vespolina\EventDispatcher\NullDispatcher;
 
 
 /**
  * @author Richard D Shank <develop@zestic.com>
  */
-class CartManagerTest extends TestCase
+class CartManagerTest extends CartTestCommon
 {
     protected $cartMgr;
     protected $container;
@@ -61,11 +52,6 @@ class CartManagerTest extends TestCase
         $this->assertEquals(1, $item->getQuantity());
     }
 
-    public function testUpdateCart()
-    {
-        $this->markTestIncomplete('todo');
-    }
-
     public function testFindOpenCartByOwner()
     {
         $owner = new Person('person');
@@ -81,6 +67,7 @@ class CartManagerTest extends TestCase
         $this->assertSame($cart->getId(), $ownersCart->getId());
 
         $this->cartMgr->setCartState($cart, Cart::STATE_CLOSED);
+        $this->cartMgr->updateCart($cart);
         $this->assertNull($this->cartMgr->findOpenCartByOwner($owner));
 
         return $cart;
@@ -93,7 +80,7 @@ class CartManagerTest extends TestCase
         $this->dm->persist($owner);
         $this->dm->flush();
 
-        $session = $this->container->get('session');
+        $session = $this->session;
         // not really a test, but it does make sure we start empty
         $this->assertNull($session->get('vespolina_cart'));
 
@@ -116,7 +103,7 @@ class CartManagerTest extends TestCase
 
     public function testGetActiveCartWithoutOwner()
     {
-        $session = $this->container->get('session');
+        $session = $this->session;
         // not really a test, but it does make sure we start empty
         $this->assertNull($session->get('vespolina_cart'));
 
@@ -138,69 +125,11 @@ class CartManagerTest extends TestCase
 
     public function setup()
     {
-        $pricingProvider = new DefaultCartPricingProvider();
-
-        $this->storage = new MockArraySessionStorage();
-        $this->session = new Session($this->storage, new AttributeBag(), new FlashBag());
-
-        $this->dm = self::createTestDocumentManager();
-        $this->cartMgr = new CartManager(
-            $this->dm,
-            $this->session,
-            $pricingProvider,
-            'Vespolina\CartBundle\Document\Cart',
-            'Vespolina\CartBundle\Document\CartItem',
-            'Vespolina\Cart\Event\CartEvents',
-            'Vespolina\EventDispatcher\Event',
-            new NullDispatcher()
-        );
+        parent::setup();
     }
 
     public function tearDown()
     {
-        $collections = $this->dm->getDocumentCollections();
-        foreach ($collections as $collection) {
-            $collection->drop();
-        }
-    }
-
-    protected function persistNewCart($name = null)
-    {
-        $cart = $this->cartMgr->createCart($name);
-        $this->cartMgr->updateCart($cart);
-
-        return $cart;
-    }
-
-    /**
-     * @return DocumentManager
-     */
-    public static function createTestDocumentManager($paths = array())
-    {
-        $paths = array_merge(array(
-            __DIR__ . '/../../Resources/config/doctrine' => 'Vespolina\\CartBundle\\Document',
-        ), $paths);
-        $config = new \Doctrine\ODM\MongoDB\Configuration();
-        $config->setAutoGenerateProxyClasses(true);
-        $config->setProxyDir(\sys_get_temp_dir());
-        $config->setHydratorDir(\sys_get_temp_dir());
-        $config->setProxyNamespace('SymfonyTests\Doctrine');
-        $config->setHydratorNamespace('SymfonyTests\Doctrine');
-
-        $xmlDriver = new XmlDriver($paths, '.mongodb.xml');
-        $xmlDriver->setGlobalBasename('mapping');
-
-        $chain = new MappingDriverChain();
-        $chain->addDriver($xmlDriver, 'Vespolina\\CartBundle\\Document');
-
-        AnnotationDriver::registerAnnotationClasses();
-        $reader = new \Doctrine\Common\Annotations\AnnotationReader();
-        $annotationDriver = new \Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver($reader, '/../Fixtures/config/doctrine');
-        $chain->addDriver($annotationDriver, 'Vespolina\\CartBundle\\Tests\\Fixtures\\Document');
-
-        $config->setMetadataDriverImpl($chain);
-        $config->setMetadataCacheImpl(new \Doctrine\Common\Cache\ArrayCache());
-
-        return DocumentManager::create(new Connection(), $config);
+        parent::tearDown();
     }
 }

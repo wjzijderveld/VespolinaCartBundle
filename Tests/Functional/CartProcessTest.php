@@ -2,32 +2,16 @@
 
 namespace Vespolina\CartBundle\Tests;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Vespolina\CartBundle\Tests\CartTestCommon;
-use Vespolina\CartBundle\Tests\Fixtures\Document\Cartable;
+use Vespolina\CartBundle\Tests\Fixtures\Document\Product;
 
-use Vespolina\CartBundle\Model\Cart;
+use Vespolina\CartBundle\Document\Cart;
 
-class CartCreateTest extends CartTestCommon
+class CartProcessTest extends CartTestCommon
 {
     protected $client;
 
-    public function setUp()
-    {
-        $this->client = $this->createClient();
-    }
-
-    public function getKernel(array $options = array())
-    {
-        if (!self::$kernel) {
-            self::$kernel = $this->createKernel($options);
-            self::$kernel->boot();
-        }
-
-        return self::$kernel;
-    }
-
-    public function testCreateCart()
+    public function testProcessCart()
     {
         $cartManager = $this->getKernel()->getContainer()->get('vespolina.cart_manager');
 
@@ -43,7 +27,6 @@ class CartCreateTest extends CartTestCommon
 
         $cart->setOwner($customerId);
         $cart->setExpiresAt(new \DateTime('now + 2 days'));
-
 
         $cartItem1 = $cartManager->addItemToCart($cart, $product1);
         $cartManager->setItemQuantity($cartItem1, 10);
@@ -95,14 +78,13 @@ class CartCreateTest extends CartTestCommon
 
     }
 
-    protected function createProduct($name, $id, $unitPriceTotal)
+    public function setup()
     {
-        $product = new Cartable();
-        $product->setName($name);
-        $product->setId($id);
+        parent::setup();
+    }
 
-        $product->setPricing(array('unitPriceTotal' => $unitPriceTotal));
-
-        return $product;
+    public function tearDown()
+    {
+        parent::tearDown();
     }
 }
