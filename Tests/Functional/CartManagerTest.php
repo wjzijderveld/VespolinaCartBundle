@@ -22,12 +22,6 @@ use Vespolina\CartBundle\Tests\Fixtures\Document\Product;
  */
 class CartManagerTest extends CartTestCommon
 {
-    protected $cartMgr;
-    protected $container;
-    protected $dm;
-    protected $storage;
-    protected $session;
-
     public function testAddProductToCart()
     {
         $cart = $this->persistNewCart();
