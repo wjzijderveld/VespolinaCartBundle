@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 
 /**
- * @ODM\Document(collection="test_person")
+ * @ODM\Document(collection="person")
  */
 class Person implements UserInterface
 {
