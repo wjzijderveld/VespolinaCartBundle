@@ -87,7 +87,6 @@ class DefaultCartPricingProvider extends AbstractCartPricingProvider
 
     public function determineCartItemPrices(ItemInterface $cartItem, $pricingContext)
     {
-
         $handler = $this->getCartHandler($cartItem);
         $handler->determineCartItemPrices($cartItem, $pricingContext);
     }
