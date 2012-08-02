@@ -10,12 +10,11 @@
         <field name="createdAt"      fieldName="createdAt"      type="date" />
         <field name="expiresAt"      fieldName="expiresAt"      type="date" />
         <field name="followUp"       fieldName="followUp"       type="string" />
-        <field name="owner"          fieldName="owner"          type="string" />
         <field name="pricingSetData" fieldName="pricingSetData" type="hash" />
         <field name="state"          fieldName="state"          type="string" />
         <field name="totalPrice"     fieldName="totalPrice"     type="string" />
         <field name="updatedAt"      fieldName="updatedAt"      type="date" />
-        <field name="attributes"      fieldName="attributes"    type="hash" strategy="set" />
+        <field name="attributes"     fieldName="attributes"     type="hash" strategy="set" />
 
         <lifecycle-callbacks>
             <lifecycle-callback type="prePersist" method="autoSetCreatedAt" />
@@ -26,6 +25,8 @@
                     field="items"
                     targetDocument="Vespolina\CartBundle\Document\CartItem"
         />
+
+        <reference-one fieldName="owner" field="owner" />
 
     </document>
 
