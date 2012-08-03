@@ -5,6 +5,7 @@
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
+
 namespace Vespolina\CartBundle\Controller;
 
 use Symfony\Component\DependencyInjection\ContainerAware;
@@ -17,7 +18,6 @@ use Vespolina\StoreBundle\Controller\AbstractController;
 /**
  * @author Richard D Shank <develop@zestic.com>
  */
-
 class DefaultController extends AbstractController
 {
     public function quickInspectionAction()
@@ -32,7 +32,6 @@ class DefaultController extends AbstractController
 
     public function navBarAction()
     {
-
         $cartManager = $this->container->get('vespolina.cart_manager');
         $cart = $this->getCart();
 
@@ -43,13 +42,12 @@ class DefaultController extends AbstractController
 
     public function addToCartAction($productId, $cartId = null)
     {
-        $product = $this->findProductById($productId);
         $cart = $this->getCart($cartId);
+        $product = $this->findProductById($productId);
+        $cartMgr = $this->container->get('vespolina.cart_manager');
 
-        try{
-            $this->container->get('vespolina.cart_manager')->addItemToCart($cart, $product);
-            $this->finishCart($cart);
-        }catch(\Exception $e) {}    //Dirty temporary hack
+        $cartMgr->addProductToCart($cart, $product);
+        $cartMgr->updateCart($cart);
 
         return new RedirectResponse($this->container->get('router')->generate('vespolina_cart_show', array('cartId' => $cartId)));
     }
@@ -58,37 +56,34 @@ class DefaultController extends AbstractController
     {
         $cart = $this->getCart($cartId);
         $product = $this->findProductById($productId);
+        $cartMgr = $this->container->get('vespolina.cart_manager');
 
-        try{
-            $this->container->get('vespolina.cart_manager')->removeItemFromCart($cart, $product);
-            $this->finishCart($cart);
-
-        }catch(\Exception $e) {}    //Dirty temporary hack
+        $cartMgr->removeProductFromCart($cart, $product);
+        $cartMgr->updateCart($cart);
 
         return new RedirectResponse($this->container->get('router')->generate('vespolina_cart_show', array('cartId' => $cartId)));
     }
 
-    public function updateCartAction ($cartId = null)
+    public function updateCartAction($cartId = null)
     {
         $request = $this->container->get('request');
         if ($request->getMethod() == 'POST')
         {
-            $cart = $this->getCart();
+            $cartMgr = $this->container->get('vespolina.cart_manager');
+            $cart = $this->getCart($cartId);
             $data = $request->get('cart');
             foreach ($data['items'] as $item)
             {
                 $product = $this->findProductById($item['product']['id']);
                 if ($item['quantity'] < 1)
                 {
-                    $this->container->get('vespolina.cart_manager')->removeItemFromCart ($cart, $product);
-                } elseif ($cartItem = $this->container->get('vespolina.cart_manager')->findItemInCart($cart, $product)) {
-                    $this->container->get('vespolina.cart_manager')->setItemQuantity($cartItem, $item['quantity']);
+                    $cartMgr->removeProductFromCart ($cart, $product);
+                } elseif ($cartItem = $this->container->get('vespolina.cart_manager')->findProductInCart($cart, $product)) {
+                    $cartMgr->setItemQuantity($cartItem, $item['quantity']);
                 }
             }
 
-            //Finish cart is only called when all required cart updates have been performed.
-            //It assures amongst that prices are only recalculated once for the entire cart
-            $this->finishCart($cart);
+            $cartMgr->updateCart($cart);
         }
 
         return new RedirectResponse($this->container->get('router')->generate('vespolina_cart_show' ));
@@ -116,12 +111,6 @@ class DefaultController extends AbstractController
         } else {
             return $this->container->get('vespolina.cart_manager')->getActiveCart();
         }
-    }
-
-    protected function finishCart(CartInterface $cart)
-    {
-        $this->container->get('vespolina.cart_manager')->finishCart($cart);
-        $this->container->get('vespolina.cart_manager')->updateCart($cart);
     }
 
     protected function getEngine()
