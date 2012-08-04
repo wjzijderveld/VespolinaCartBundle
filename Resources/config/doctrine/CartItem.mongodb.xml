@@ -16,7 +16,7 @@
 
         <reference-one fieldName="parent" field="parent" />
 
-        <embedd-one field="pricingSet" fieldName="pricingSet" />
+        <embed-one field="pricingSet" fieldName="pricingSet" target-document="Vespolina\CartBundle\Document\PricingSet" />
 
     </embedded-document>
 </doctrine-mongo-mapping>

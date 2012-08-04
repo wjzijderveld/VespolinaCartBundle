@@ -23,7 +23,7 @@
 
         <embed-many fieldName="items"
                     field="items"
-                    targetDocument="Vespolina\CartBundle\Document\CartItem"
+                    target-document="Vespolina\CartBundle\Document\CartItem"
         />
 
         <reference-one fieldName="owner" field="owner" />
