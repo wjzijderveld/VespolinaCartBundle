@@ -62,12 +62,8 @@ class VespolinaCartExtension extends Extension
 
     protected function configureCartPricingProvider(array $config, ContainerBuilder $container)
     {
-
-
         if (isset($config['enabled']) && !$config['enabled']) {
-
             $this->disablePricing($container);
-
         }
 
         if (isset($config['class'])) {
