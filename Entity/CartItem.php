@@ -7,7 +7,7 @@
  */
 namespace Vespolina\CartBundle\Entity;
 
-use Vespolina\CartBundle\Model\BaseCartItem;
+use Vespolina\Entity\Order\Item as BaseCartItem;
 /**
  * @author Daniel Kucharski <daniel@xerias.be>
  */

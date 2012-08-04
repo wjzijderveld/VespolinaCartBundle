@@ -16,7 +16,7 @@ class Cart extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Vespolina\CartBundle\Model\Cart',
+            'data_class' => 'Vespolina\Entity\Order\Cart',
         ));
     }
 

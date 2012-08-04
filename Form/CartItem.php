@@ -18,7 +18,7 @@ class CartItem extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Vespolina\CartBundle\Model\CartItem',
+            'data_class' => 'Vespolina\Entity\Order\Item',
             'cascade_validation' => true,
             ));
     }

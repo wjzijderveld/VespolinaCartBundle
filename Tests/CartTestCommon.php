@@ -52,14 +52,14 @@ abstract class CartTestCommon extends TestCase
 
     protected function createCart($name = 'default')
     {
-        $cart = $this->getMockForAbstractClass('Vespolina\CartBundle\Model\Cart', array($name));
+        $cart = $this->getMockForAbstractClass('Vespolina\Entity\Order\Cart', array($name));
 
-        $sp = new \ReflectionProperty('Vespolina\CartBundle\Model\Cart', 'state');
+        $sp = new \ReflectionProperty('Vespolina\Entity\Order\Cart', 'state');
         $sp->setAccessible(true);
         $sp->setValue($cart, Cart::STATE_OPEN);
         $sp->setAccessible(false);
 
-        $pr = new \ReflectionProperty('Vespolina\CartBundle\Model\Cart', 'pricingSet');
+        $pr = new \ReflectionProperty('Vespolina\Entity\Order\Cart', 'pricingSet');
         $pr->setAccessible(true);
         $pr->setValue($cart, $this->getPricingProvider()->createPricingSet());
         $pr->setAccessible(false);
@@ -69,18 +69,18 @@ abstract class CartTestCommon extends TestCase
     protected function createCartItem($product)
     {
         // todo: this should handle recurring interface
-        $cartItem = $this->getMockForAbstractClass('Vespolina\CartBundle\Model\CartItem', array($product));
+        $cartItem = $this->getMockForAbstractClass('Vespolina\Entity\Order\Item', array($product));
         $cartItem->setDescription($product->getName());
 
         if ($product instanceof RecurringInterface) {
-            $irp = new \ReflectionProperty('Vespolina\CartBundle\Model\CartItem', 'isRecurring');
+            $irp = new \ReflectionProperty('Vespolina\Entity\Order\Item', 'isRecurring');
             $irp->setAccessible(true);
             $irp->setValue($cartItem, true);
             $irp->setAccessible(false);
         }
 
         //Pricing
-        $prrp = new \ReflectionProperty('Vespolina\CartBundle\Model\CartItem', 'pricingSet');
+        $prrp = new \ReflectionProperty('Vespolina\Entity\Order\Item', 'pricingSet');
         $prrp->setAccessible(true);
         $prrp->setValue($cartItem, $this->getPricingProvider()->createPricingSet());
         $prrp->setAccessible(false);
