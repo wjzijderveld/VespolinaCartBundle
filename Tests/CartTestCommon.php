@@ -102,8 +102,7 @@ abstract class CartTestCommon extends TestCase
             $pricingProvider,
             'Vespolina\CartBundle\Document\Cart',
             'Vespolina\CartBundle\Document\CartItem',
-            'Vespolina\Cart\Event\CartEvents',
-            'Vespolina\EventDispatcher\Event',
+            'Vespolina\Entity\Order\CartEvents',
             new NullDispatcher()
         );
     }

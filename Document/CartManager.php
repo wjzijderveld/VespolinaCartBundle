@@ -27,14 +27,14 @@ class CartManager extends BaseCartManager
     protected $primaryIdentifier;
     protected $session;
 
-    public function __construct(DocumentManager $dm, SessionInterface $session, CartPricingProviderInterface $pricingProvider = null, $cartClass, $cartItemClass, $cartEvents, $eventClass, $eventDispatcher)
+    public function __construct(DocumentManager $dm, SessionInterface $session, CartPricingProviderInterface $pricingProvider = null, $cartClass, $cartItemClass, $cartEvents, $eventDispatcher)
     {
         $this->dm = $dm;
 
         $this->cartRepo = $this->dm->getRepository($cartClass);
         $this->session = $session;
 
-        parent::__construct($pricingProvider, $cartClass, $cartItemClass, $cartEvents, $eventClass, $eventDispatcher);
+        parent::__construct($pricingProvider, $cartClass, $cartItemClass, $cartEvents, $eventDispatcher);
     }
 
     /**
