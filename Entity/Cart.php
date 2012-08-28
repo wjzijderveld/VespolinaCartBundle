@@ -13,5 +13,4 @@ use Vespolina\CartBundle\Entity\BaseCart;
  */
 class Cart extends BaseCart
 {
-    parent::__construct('cart');
 }
