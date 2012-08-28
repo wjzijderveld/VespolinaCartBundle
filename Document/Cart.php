@@ -13,7 +13,8 @@ use Vespolina\CartBundle\Document\BaseCart;
  */
 class Cart extends BaseCart
 {
-    public function __construct()
+    public function __construct($name)
     {
+        parent::__construct($name);
     }
 }
