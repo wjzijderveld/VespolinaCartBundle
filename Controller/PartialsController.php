@@ -25,6 +25,22 @@ class PartialsController extends ContainerAware
         ));
     }
 
+    public function navBarAction()
+    {
+        $cart = $this->getCart();
+
+        return $this->container->get('templating')->renderResponse('VespolinaCartBundle:Partials:navBar.html.twig', array('cart' => $cart));
+    }
+
+    protected function getCart($cartId = null)
+    {
+        if ($cartId) {
+            return $this->container->get('vespolina.cart_manager')->findCartById($cartId);
+        } else {
+            return $this->container->get('vespolina.cart_manager')->getActiveCart();
+        }
+    }
+
     protected function getEngine()
     {
         return $this->container->getParameter('vespolina_cart.template.engine');

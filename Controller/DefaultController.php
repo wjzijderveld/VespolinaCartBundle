@@ -30,16 +30,6 @@ class DefaultController extends AbstractController
         return $this->render('VespolinaCartBundle:Default:quickInspection.html.twig', array('cart' => $cart, 'totalPrice' => $totalPrice ));
     }
 
-    public function navBarAction()
-    {
-        $cartManager = $this->container->get('vespolina.cart_manager');
-        $cart = $this->getCart();
-
-        $totalPrice = $cart->getPricingSet()->get('totalGross');
-
-        return $this->render('VespolinaCartBundle:Default:navBar.html.twig', array('cart' => $cart, 'totalPrice' => $totalPrice ));
-    }
-
     public function addToCartAction($productId, $cartId = null)
     {
         $cart = $this->getCart($cartId);
