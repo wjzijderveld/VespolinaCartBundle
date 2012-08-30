@@ -7,12 +7,18 @@
     <parameters>
         <parameter key="vespolina_cart.template.engine">twig</parameter>
         <parameter key="vespolina.cart_handler.default.class">Vespolina\Cart\Handler\DefaultCartHandler</parameter>
+        <parameter key="vespolina.pricing_provider.default.class">Vespolina\Cart\Pricing\DefaultCartPricingProvider</parameter>
     </parameters>
 
     <services>
         <service id="vespolina.cart_handler.default" class="%vespolina.cart_handler.default.class%">
             <tag name="vespolina.cart_handler" />
         </service>
+
+        <service id="vespolina.pricing_provider.default" class="%vespolina.pricing_provider.default.class%">
+        </service>
+
+        <service id="vespolina.pricing_provider" alias="vespolina.pricing_provider.default" />
 
         <!-- events -->
         <service id="vespolina.cart.listener.cart" class="Vespolina\CartBundle\EventListener\CartListener">

@@ -25,7 +25,7 @@ class CartListener
     {
         $cart = $event->getSubject();
 
-        $this->container->get('vespolina.cart_manager')->determinePrices($cart);
+        $this->container->get('vespolina.pricing_provider')->determineCartPrices($cart);
     }
 
     protected function getMailBody(OrderInterface $salesOrder)
