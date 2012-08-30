@@ -20,7 +20,7 @@ class CartItem extends AbstractType
         $resolver->setDefaults(array(
             'data_class' => 'Vespolina\Entity\Order\Item',
             'cascade_validation' => true,
-            ));
+        ));
     }
 
     public function getName()

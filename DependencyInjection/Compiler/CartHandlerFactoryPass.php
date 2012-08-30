@@ -27,6 +27,5 @@ class CartHandlerFactoryPass implements CompilerPassInterface
             $taxationManagerDefinition = $container->getDefinition('vespolina.taxation.taxation_manager');
             $factory->addMethodCall('setTaxationManager', array($taxationManagerDefinition));
         }
-
     }
 }

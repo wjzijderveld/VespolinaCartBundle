@@ -57,19 +57,18 @@ class DefaultController extends AbstractController
     public function updateCartAction($cartId = null)
     {
         $request = $this->container->get('request');
-        if ($request->getMethod() == 'POST')
-        {
+        if ($request->getMethod() == 'POST') {
             $cartMgr = $this->container->get('vespolina.cart_manager');
             $cart = $this->getCart($cartId);
             $data = $request->get('cart');
-            foreach ($data['items'] as $item)
-            {
-                $product = $this->findProductById($item['product']['id']);
-                if ($item['quantity'] < 1)
-                {
-                    $cartMgr->removeProductFromCart ($cart, $product);
-                } elseif ($cartItem = $this->container->get('vespolina.cart_manager')->findProductInCart($cart, $product)) {
-                    $cartMgr->setItemQuantity($cartItem, $item['quantity']);
+            if (isset($data['items'])) {
+                foreach ($data['items'] as $item) {
+                    $product = $this->findProductById($item['product']['id']);
+                    if ($item['quantity'] < 1) {
+                        $cartMgr->removeProductFromCart($cart, $product);
+                    } elseif ($cartItem = $this->container->get('vespolina.cart_manager')->findProductInCart($cart, $product)) {
+                        $cartMgr->setItemQuantity($cartItem, $item['quantity']);
+                    }
                 }
             }
 
