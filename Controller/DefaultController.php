@@ -75,7 +75,7 @@ class DefaultController extends AbstractController
             $cartMgr->updateCart($cart);
         }
 
-        return new RedirectResponse($this->container->get('router')->generate('vespolina_cart_show' ));
+        return new RedirectResponse($this->container->get('router')->generate('vespolina_cart_show', array('cartId' => $cartId)));
     }
 
     public function showAction($cartId = null)
