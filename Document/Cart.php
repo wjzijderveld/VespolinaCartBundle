@@ -8,10 +8,16 @@
 namespace Vespolina\CartBundle\Document;
 
 use Vespolina\Entity\Order\Cart as BaseCart;
+
+use Doctrine\Common\Collections\ArrayCollection;
+
 /**
  * @author Daniel Kucharski <daniel@xerias.be>
  */
 class Cart extends BaseCart
 {
-
+    public function __construct()
+    {
+        $this->items = array();
+    }
 }
