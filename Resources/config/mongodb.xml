@@ -16,7 +16,7 @@
 
     <services>
         <service id="vespolina.cart.cart_manager" class="%vespolina.cart.cart_manager.class%">
-            <argument type="service" id="doctrine.odm.mongodb.default_document_manager" />
+            <argument type="service" id="doctrine_mongodb.odm.default_document_manager" />
             <argument type="service" id="session" />
             <argument type="service" id="vespolina.cart.gateway" />
             <argument>%vespolina.cart.entity.cart.class%</argument>
