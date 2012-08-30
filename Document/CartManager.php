@@ -9,7 +9,7 @@ namespace Vespolina\CartBundle\Document;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Vespolina\Cart\Pricing\CartPricingProviderInterface;
+use Vespolina\Cart\Gateway\CartGatewayInterface;
 use Vespolina\CartBundle\Document\Cart;
 use Vespolina\Entity\Order\CartInterface;
 use Vespolina\Entity\Order\ItemInterface;
@@ -27,30 +27,14 @@ class CartManager extends BaseCartManager
     protected $primaryIdentifier;
     protected $session;
 
-    public function __construct(DocumentManager $dm, SessionInterface $session, CartPricingProviderInterface $pricingProvider = null, $cartClass, $cartItemClass, $cartEvents, $eventDispatcher)
+    public function __construct(DocumentManager $dm, SessionInterface $session, CartGatewayInterface $gateway, $cartClass, $cartItemClass, $cartEvents, $eventDispatcher)
     {
         $this->dm = $dm;
 
         $this->cartRepo = $this->dm->getRepository($cartClass);
         $this->session = $session;
 
-        parent::__construct($pricingProvider, $cartClass, $cartItemClass, $cartEvents, $eventDispatcher);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
-    {
-        return $this->cartRepo->findBy($criteria, $orderBy, $limit, $offset);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function findCartById($id)
-    {
-        return $this->cartRepo->find($id);
+        parent::__construct($gateway, $cartClass, $cartItemClass, $cartEvents, $eventDispatcher);
     }
 
     /**
@@ -96,10 +80,24 @@ class CartManager extends BaseCartManager
     /**
      * @inheritdoc
      */
-    public function updateCart(CartInterface $cart, $andPersist = true)
+    protected function doFindBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {
-        parent::updateCart($cart, $andPersist);
+        return $this->cartRepo->findBy($criteria, $orderBy, $limit, $offset);
+    }
 
+    /**
+     * @inheritdoc
+     */
+    protected function doFindCartById($id)
+    {
+        return $this->cartRepo->find($id);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function doUpdateCart(CartInterface $cart, $andPersist = true)
+    {
         $this->dm->persist($cart);
         if ($andPersist) {
             $this->dm->flush($cart);

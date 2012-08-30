@@ -11,13 +11,14 @@
         <parameter key="vespolina.cart.entity.cart_item.class">Vespolina\CartBundle\Document\CartItem</parameter>
         <parameter key="vespolina.cart.entity.cart_events.class">Vespolina\Entity\Order\CartEvents</parameter>
         <parameter key="vespolina.cart.event.event.class">Vespolina\EventDispatcher\Order\Event</parameter>
+        <parameter key="vespolina.cart.gateway.class">Vespolina\Cart\Gateway\CartMemoryGateway</parameter>
     </parameters>
 
     <services>
         <service id="vespolina.cart.cart_manager" class="%vespolina.cart.cart_manager.class%">
             <argument type="service" id="doctrine.odm.mongodb.default_document_manager" />
             <argument type="service" id="session" />
-            <argument type="service" id="vespolina.cart.pricing_provider" />
+            <argument type="service" id="vespolina.cart.gateway" />
             <argument>%vespolina.cart.entity.cart.class%</argument>
             <argument>%vespolina.cart.entity.cart_item.class%</argument>
             <argument>%vespolina.cart.entity.cart_events.class%</argument>
@@ -25,6 +26,10 @@
         </service>
 
         <service id="vespolina.cart_manager" alias="vespolina.cart.cart_manager" />
+
+        <service id="vespolina.cart.gateway" class="%vespolina.cart.gateway.class%">
+
+        </service>
 
         <service id="vespolina.cart.pricing_provider" class="%vespolina.cart.pricing_provider.class%">
             <call method="setTaxationManager">
