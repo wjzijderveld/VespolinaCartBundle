@@ -17,7 +17,7 @@
                         {{ form_widget(item.quantity, { 'attr': { 'class': 'span1'}}) }}
                         {{ form_widget(item.product.id) }}
                     </td>
-                    <td>{{ item.vars.value.totalPrice | price_format(store.defaultCurrency)}}</td>
+                    <td>{{ item.vars.value.pricing.get('totalPrice') | price_format(store.defaultCurrency)}}</td>
                     <td><a href="{{ path('vespolina_cart_remove_product', {'productId': item.vars.value.product.id}) }}"><i class="icon-trash"></i></a></td>
                 </tr>
             {% else %}
@@ -39,15 +39,15 @@
 </table>
 
 <div class="well span3 offset6">
-<center>
-    <strong>Grand Total</strong> {{ cart.pricingSet.get('totalGross') | price_format(store.defaultCurrency) }}<br/>
-    {% if cart.getAttribute('taxation_enabled') == true %}
-    Tax {{ cart.pricingSet.get('totalTax') | price_format(store.defaultCurrency) }}<br/>
-    {% endif %}
-    <br/>
-    <a href="{{ path('vespolina_store_cart_checkout')}}" class="btn btn-success">
-        <i class="icon-shopping-cart icon-white"></i>
-        Checkout
-    </a>
-    </center>
+    <p align="center">
+        <strong>Grand Total</strong> {{ cart.pricing.get('totalGross') | price_format(store.defaultCurrency) }}<br/>
+        {% if cart.getAttribute('taxation_enabled') == true %}
+        Tax {{ cart.pricing.get('totalTax') | price_format(store.defaultCurrency) }}<br/>
+        {% endif %}
+        <br/>
+        <a href="{{ path('vespolina_store_cart_checkout')}}" class="btn btn-success">
+            <i class="icon-shopping-cart icon-white"></i>
+            Checkout
+        </a>
+    </p>
 </div>

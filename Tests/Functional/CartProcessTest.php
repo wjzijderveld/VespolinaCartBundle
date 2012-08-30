@@ -30,7 +30,7 @@ class CartProcessTest extends CartTestCommon
 
         $cartItem1 = $this->cartMgr->addProductToCart($cart, $product1);
         $this->cartMgr->setItemQuantity($cartItem1, 10);
-        $cartItem1->getPricingSet()->set('unitPrice', 499);
+        $cartItem1->getPricing()->set('unitPrice', 499);
 
         $cartItem1->addOption('color', 'white');
         $cartItem1->addOption('connectivity', 'WIFI+3G');
@@ -44,7 +44,7 @@ class CartProcessTest extends CartTestCommon
         $cartItem2 = $this->cartMgr->addItemToCart($cart, $product2);
         $this->cartMgr->setItemQuantity($cartItem2, 2);
 
-        $cartItem2->getPricingSet()->set('unitPrice', 699);
+        $cartItem2->getPricing()->set('unitPrice', 699);
         $this->cartMgr->setCartItemState($cartItem2, 'init');
 
         $testCartItem1 = $cart->getItem(1);
@@ -63,7 +63,7 @@ class CartProcessTest extends CartTestCommon
 
         $aCartItem1 = $aCart->getItem(1);
 
-        $this->assertEquals($aCartItem1->getPricingSet()->get('unitPriceTotal'), 499);
+        $this->assertEquals($aCartItem1->getPricing()->get('unitPriceTotal'), 499);
         $this->assertEquals($aCartItem1->getOption('color'), 'white');
 
         //...and close it

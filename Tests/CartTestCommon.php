@@ -61,7 +61,7 @@ abstract class CartTestCommon extends TestCase
 
         $pr = new \ReflectionProperty('Vespolina\Entity\Order\Cart', 'pricingSet');
         $pr->setAccessible(true);
-        $pr->setValue($cart, $this->getPricingProvider()->createPricingSet());
+        $pr->setValue($cart, $this->getPricingProvider()->createPricing());
         $pr->setAccessible(false);
         return $cart;
     }
@@ -82,7 +82,7 @@ abstract class CartTestCommon extends TestCase
         //Pricing
         $prrp = new \ReflectionProperty('Vespolina\Entity\Order\Item', 'pricingSet');
         $prrp->setAccessible(true);
-        $prrp->setValue($cartItem, $this->getPricingProvider()->createPricingSet());
+        $prrp->setValue($cartItem, $this->getPricingProvider()->createPricing());
         $prrp->setAccessible(false);
 
         return $cartItem;
