@@ -4,18 +4,18 @@
                         xsi:schemaLocation="http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping
                         http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd">
 
-    <embedded-document name="Vespolina\CartBundle\Document\CartItem">
+    <mapped-superclass name="Vespolina\CartBundle\Document\CartItem">
 
         <field name="name"           fieldName="name"           type="string" />
         <field name="options"        fieldName="options"        type="hash" />
         <field name="quantity"       fieldName="quantity"       type="string" />
         <field name="state"          fieldName="state"          type="string" />
 
-        <reference-one fieldName="product" field="product" />
+<!--        <reference-one fieldName="product" field="product" /> -->
 
         <reference-one fieldName="parent" field="parent" />
 
         <embed-one field="pricingSet" fieldName="pricingSet" target-document="Vespolina\CartBundle\Document\PricingSet" />
 
-    </embedded-document>
+    </mapped-superclass>
 </doctrine-mongo-mapping>

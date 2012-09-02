@@ -4,8 +4,8 @@
                         xsi:schemaLocation="http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping
                         http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd">
 
-    <document name="Vespolina\CartBundle\Document\Cart" collection="vespolina_cart">
-        <field name="id" id="true" />
+    <mapped-superclass name="Vespolina\CartBundle\Document\Cart" collection="vespolina_cart">
+<!--        <field name="id" id="true" /> -->
 
         <field name="createdAt"      fieldName="createdAt"      type="date" />
         <field name="expiresAt"      fieldName="expiresAt"      type="date" />
@@ -17,15 +17,14 @@
 
 
         <embed-one field="pricingSet" fieldName="pricingSet" target-document="Vespolina\CartBundle\Document\PricingSet" />
-        <embed-many target-document="Vespolina\CartBundle\Document\CartItem" field="items" />
 
-        <reference-one fieldName="owner" field="owner" />
+        <!--        <reference-one fieldName="owner" field="owner" /> -->
 
         <lifecycle-callbacks>
             <lifecycle-callback type="prePersist" method="autoSetCreatedAt" />
             <lifecycle-callback type="preUpdate"  method="autoSetUpdatedAt" />
         </lifecycle-callbacks>
 
-    </document>
+    </mapped-superclass>
 
 </doctrine-mongo-mapping>
