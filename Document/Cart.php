@@ -16,7 +16,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class Cart extends BaseCart
 {
-    public function __construct($name)
+    public function __construct()
     {
         $this->items = array();
     }
