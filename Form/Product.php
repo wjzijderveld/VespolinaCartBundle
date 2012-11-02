@@ -16,7 +16,7 @@ class Product extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Vespolina\ProductBundle\Model\Product',
+            'data_class' => 'Vespolina\Entity\Product\Product',
             'cascade_validation' => true,
         ));
     }
